@@ -1,30 +1,22 @@
 #!/usr/bin/env python3
-"""news-image-20261117: copy the pre-drawn front page to the output dir.
+"""Entry point for the news-image-20261117 v3 front page.
 
-The image (1024x1024 PNG, "THE WORLD — Tuesday 17 November 2026") was
-drawn with Pillow during development and is stored next to this file as
-entry.png. This program is stdlib-only: it just copies that file to
-$MAKEFUN_OUTPUT_DIR/entry.png, so both runs write identical bytes.
+Copies the pre-rendered 1024x1024 front page (entry.png, next to this
+script) into the make.fun output directory. Stdlib only, no network,
+no arguments: the output directory comes from MAKEFUN_OUTPUT_DIR and
+defaults to the current directory when the variable is unset.
 """
 import os
 import shutil
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+SOURCE = os.path.join(HERE, "entry.png")
+OUTPUT_DIR = os.environ.get("MAKEFUN_OUTPUT_DIR", ".")
 
+if not os.path.isfile(SOURCE):
+    raise SystemExit("entry.png is missing next to main.py: " + SOURCE)
 
-MAX_BYTES = 1048576  # competition limit: at most 1 MiB
-
-
-def main():
-    src = os.path.join(HERE, "entry.png")
-    if not os.path.isfile(src):
-        raise SystemExit("entry.png missing next to main.py")
-    if os.path.getsize(src) > MAX_BYTES:
-        raise SystemExit("entry.png exceeds the 1 MiB limit")
-    os.makedirs(OUT, exist_ok=True)
-    shutil.copyfile(src, os.path.join(OUT, "entry.png"))
-
-
-if __name__ == "__main__":
-    main()
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+DESTINATION = os.path.join(OUTPUT_DIR, "entry.png")
+shutil.copyfile(SOURCE, DESTINATION)
+print("wrote " + DESTINATION)
